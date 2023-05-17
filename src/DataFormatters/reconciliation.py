@@ -29,4 +29,6 @@ for filename in os.listdir(directory):
             lookupIris = pd.concat([lookupIris, lookup], axis=0)
 
 lookupIris = lookupIris.drop_duplicates()
-lookupIris.to_csv('../../data/lookupIRIS.csv', index=False)
+#sant andreu codi
+#drop duplicates de input_value
+lookupIris.to_csv('../../data/lookup_tables/lookupIRISnew.csv', index=False)
