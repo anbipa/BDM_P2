@@ -8,6 +8,7 @@ import json
 import os
 import re
 
+
 sc = pyspark.SparkContext.getOrCreate()
 sqlContext = SQLContext(sc)
 pattern = r'(".*?),(.*)(")'
@@ -46,6 +47,14 @@ iris_reconciled = irisRDDmapped.leftOuterJoin(lookupRDDmapped) \
     .map(lambda x: (x[0], *x[1])) \
     .filter(lambda row: len(row) == 26)
 
-print(iris_reconciled.first())
+# print(iris_reconciled.first())
+df = iris_reconciled.toDF(["neighborhoodID","fitxaID", "type", "area", "element", "detall", "diaDataAlta", "mesDataAlta",
+                           "anyDataAlta", "diaDataTancament", "mesDataTancament", "anyDataTancament", "CODI DISTRICTE",
+                           "DISTRICTE", "CODI BARRI", "BARRI", "seccioCensal", "tipusVia", "carrer", "numero", "coordenadaX", "coordenadaY", "longitud", "latitud", "suport", "canalsResposta"])
+
+
+print(df.show())
+# output_path = "hdfs://10.4.41.44:9870/user/bdm/formattedZone/iris.parquet"
+# df.write.parquet(output_path)
 
 
