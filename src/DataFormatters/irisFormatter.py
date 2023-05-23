@@ -11,7 +11,7 @@ import re
 
 def load_lookup_table(sc):
     lookupRDD = sc.textFile("../../data/lookup_tables/lookupIRIS.csv")
-
+    pattern = r'(".*?),(.*)(")'
     headerLookup = lookupRDD.first()  # Filter header row
     # Map each CSV row to a tuple
     lookupRDDtuples = lookupRDD.filter(lambda row: row != headerLookup) \
@@ -57,7 +57,7 @@ def save_to_parquet(df, output_path):
 if __name__ == "__main__":
     sc = pyspark.SparkContext.getOrCreate()
     sqlContext = SQLContext(sc)
-    pattern = r'(".*?),(.*)(")'
+
 
     lookupRDDtuples = load_lookup_table(sc)
     rdd_tuples = load_iris_dataset(sc)
