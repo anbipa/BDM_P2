@@ -7,7 +7,7 @@ from pyspark import SparkConf
 import json
 import os
 import re
-
+from incomeFormatter import drop_duplicates
 
 def load_lookup_table(sc):
     lookupRDD = sc.textFile("../../data/lookup_tables/lookupIRIS.csv")
@@ -51,7 +51,7 @@ def reconcile_data(lookupRDDtuples, rdd_tuples):
 
 
 def save_to_parquet(df, output_path):
-    df.write.parquet(output_path)
+    df.write.parquet(output_path, mode="overwrite")
 
 
 if __name__ == "__main__":
@@ -61,6 +61,7 @@ if __name__ == "__main__":
 
     lookupRDDtuples = load_lookup_table(sc)
     rdd_tuples = load_iris_dataset(sc)
+    rdd_tuples = drop_duplicates(rdd_tuples)
 
     iris_reconciled = reconcile_data(lookupRDDtuples, rdd_tuples)
 

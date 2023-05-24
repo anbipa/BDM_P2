@@ -29,7 +29,7 @@ def save_to_parquet(rdd):
     # Convert RDD to DataFrame
     df = spark.createDataFrame(rdd, ["neighborhood_id", "neighborhood_reconciled", "district_id", "district_reconciled"])
     # Write DataFrame to Parquet file in HDFS
-    df.write.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/neighborhoods")
+    df.write.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/neighborhoods", mode="overwrite")
     # Stop the SparkSession
     spark.stop()
 

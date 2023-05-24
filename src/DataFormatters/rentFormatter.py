@@ -4,6 +4,7 @@ import pyspark
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 import json
+from incomeFormatter import drop_duplicates
 
 
 def row_to_tuple(row):
@@ -76,7 +77,7 @@ def save_to_parquet(rdd, output_path, schema):
     df = spark.createDataFrame(rdd, schema)
 
     # Write DataFrame to Parquet file
-    df.write.parquet(output_path)
+    df.write.parquet(output_path, mode="overwrite")
 
     # Stop the SparkSession
     spark.stop()
@@ -144,6 +145,8 @@ if __name__ == "__main__":
 
     # Load rent data
     rentRDD = load_rent_data(spark, parent_dir, schema)
+    rentRDD = drop_duplicates(rentRDD)
+
 
     rentRDD = rentRDD.filter(lambda x: x[18] is not None)
     rentLookupRDD = rentLookupRDD.filter(lambda x: x[1] is not None)

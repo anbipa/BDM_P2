@@ -3,6 +3,8 @@ from pyspark.sql import SparkSession
 import json
 
 
+def drop_duplicates(rdd):
+    return rdd.distinct()
 
 def load_income_dataset(sc):
     incomes = sc.textFile("../../data/income_opendata/income_opendata_neighborhood.json")
@@ -60,7 +62,7 @@ def save_to_parquet(rdd):
     df = spark.createDataFrame(rdd, ["id", "year", "population", "RFD", "neighborhood_id"])
 
     # Write DataFrame to Parquet file in HDFS
-    df.write.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income")
+    df.write.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income", mode="overwrite")
 
     # Stop the SparkSession
     spark.stop()
@@ -69,6 +71,7 @@ def save_to_parquet(rdd):
 if __name__ == "__main__":
     sc = pyspark.SparkContext.getOrCreate()
     incomeRDD = load_income_dataset(sc)
+    incomeRDD = drop_duplicates(incomeRDD)
     lookupRDD = load_lookup_tables(sc)
     rdd = reconcile_income_data(incomeRDD, lookupRDD)
     print(rdd.first())
