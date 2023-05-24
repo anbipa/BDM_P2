@@ -3,43 +3,6 @@ from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
 
-# Function to save each partition of the DataFrame to PostgreSQL
-def save_partition(iter):
-    # Establish a connection to PostgreSQL
-    conn = psycopg2.connect(
-        host="database-bdmp2.cjhqgymunwij.eu-north-1.rds.amazonaws.com",
-        port="5432",
-        dbname="postgres",
-        user="anioldani",
-        password="anioldaniP2"
-    )
-    cursor = conn.cursor()
-
-    # Drop the table if it exists
-    drop_table_statement = "DROP TABLE IF EXISTS kpi1"
-    cursor.execute(drop_table_statement)
-
-    # Create table if not exists
-    cursor.execute("CREATE TABLE IF NOT EXISTS kpi1 (neighborhood VARCHAR(255), year INT, avg_income FLOAT, avg_rent FLOAT)")
-
-    # Iterate over the partition and insert rows into the PostgreSQL table
-    for row in iter:
-        neighborhood = row.neighborhood
-        year = row.year
-        avg_income = row.avg_income
-        avg_rent = row.avg_rent
-
-
-        # Construct the INSERT statement
-        insert_statement = f"INSERT INTO kpi1 (neighborhood, year, avg_income, avg_rent) VALUES ('{neighborhood}', {year}, {avg_income}, {avg_rent})"
-
-        # Execute the INSERT statement
-        cursor.execute(insert_statement)
-
-    # Commit the changes and close the cursor and connection
-    conn.commit()
-    cursor.close()
-    conn.close()
 
 conf = SparkConf() \
         .set("spark.master", "local") \
