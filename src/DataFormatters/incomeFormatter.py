@@ -62,7 +62,7 @@ def save_to_parquet(rdd):
     df = spark.createDataFrame(rdd, ["id", "year", "population", "RFD", "neighborhood_id"])
 
     # Write DataFrame to Parquet file in HDFS
-    df.write.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income", mode="overwrite")
+    df.write.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income2", mode="overwrite")
 
     # Stop the SparkSession
     spark.stop()

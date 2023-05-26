@@ -1,7 +1,6 @@
-import psycopg2
+# import psycopg2
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
-
 
 
 conf = SparkConf() \
@@ -55,10 +54,13 @@ print(result_df.show())
 
 # Save the DataFrame to PostgreSQL
 result_df.write \
-    .format("jdbc") \
-    .option("url", "jdbc:postgresql://database-bdmp2.cjhqgymunwij.eu-north-1.rds.amazonaws.com:5432/postgres") \
-    .option("dbtable", "kpi1") \
-    .option("user", "anioldani") \
-    .option("password", "anioldaniP2") \
-    .mode("overwrite") \
-    .save()
+        .format("jdbc") \
+        .option("url", "jdbc:postgresql://10.4.41.44:5432/bdmp2") \
+        .option("dbtable", "kpi1") \
+        .option("user", "anioldani") \
+        .option("password", "anioldani") \
+        .mode("overwrite") \
+        .save()
+
+
+

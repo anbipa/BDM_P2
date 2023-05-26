@@ -1,51 +1,62 @@
+from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
-# Compute the rental affordability ratio for each neighborhood
-# The Affordability Ratio, often defined as the average rent price divided by the average income, is a common indicator of housing affordability.
-def kpi_calculators2():
-    spark = SparkSession.builder.appName("ReadParquetRDD").getOrCreate()
+conf = SparkConf() \
+        .set("spark.master", "local") \
+        .set("spark.app.name", "Spark Dataframes Tutorial") \
+        .set("spark.jars", "../../data/postgresql-42.6.0.jar") \
+        .set("spark.driver.extraClassPath", "../../data/postgresql-42.6.0.jar")
 
-    # read data from hdfs into rdd
-    iris_df = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/iris").select("neighborhoodID", "type", "anyDataTancament")
-    income_df = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income").select("neighborhood_id", "population", "year" )
+spark = SparkSession.builder\
+    .appName("ComputeKPIs")\
+    .config(conf=conf) \
+    .getOrCreate()
+
+# read data from hdfs into rdd
+iris_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/iris").select("neighborhoodID", "type", "diaDataAlta", "mesDataAlta", "anyDataAlta").rdd.map(tuple)
+income_df = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income2").select("neighborhood_id", "year", "population")#.rdd.map(tuple)
+rents_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent").select("day", "month", "year", "neighborhoodId").rdd.map(tuple)
+
+# Get counting of housing per neighborhood and year
+housing_rdd = rents_rdd.map(lambda x: (x, 1)).reduceByKey(lambda a, b: a+b)
+
+# Get counting of incidences per neighborhood and day
+incidences_rdd = iris_rdd.filter(lambda x: x[1]=='INCIDENCIA').map(lambda x: ((int(x[2]), int(x[3]), int(x[4]), x[0]),  1)).reduceByKey(lambda a, b: (a + b))
+
+#Join them in one single rdd
+incidencesAndHousing = incidences_rdd.leftOuterJoin(housing_rdd).map(lambda x: (*x[0], *x[1])) # leftOuterJoins produces NULLS because only exist data for 2020 and 2021 in renting dataset. We can put join to just have joins
+
+result_df = incidencesAndHousing.toDF(["day", "month", "year", "neighborhood", "count_incidences", "count_housing"])
+result_df.write \
+        .format("jdbc") \
+        .option("url", "jdbc:postgresql://10.4.41.44:5432/bdmp2") \
+        .option("dbtable", "kpi2") \
+        .option("user", "anioldani") \
+        .option("password", "anioldani") \
+        .mode("overwrite") \
+        .save()
+income_df.write \
+        .format("jdbc") \
+        .option("url", "jdbc:postgresql://10.4.41.44:5432/bdmp2") \
+        .option("dbtable", "population") \
+        .option("user", "anioldani") \
+        .option("password", "anioldani") \
+        .mode("overwrite") \
+        .save()
+
+print("DONEEE")
+
+# #NO FUNCIONA NO SE PERQUE :( NO FALLA PERO VA MOLT LENT I NO ACABA MAI
+# incidencesAndHousing = incidencesAndHousing.map(lambda x: ((x[2], x[3]), x[0], x[1], x[4], x[5]))
+# print(incidencesAndHousing.first())
+# income = income_df.rdd.map(tuple).map(lambda x: ((x[1],x[0]), x[2]))
+# print(income.first())
+# r = incidencesAndHousing.join(income)#.map(lambda x: ((x[0][2], x[0][3]),(x[0][0], x[0][1], x[1][0],x[1][1])))# ((year, neighborhood),(day, month, incidenceCounts, housingCount))
+# print(r.take(3))
 
 
 
 
-
-    # ((2009, 'Q1758503'), ('Q1758503', 49315))
-    # ((2007, 'Q1758503'), ('Q1758503', 46595))
-
-    # convert to rdd
-    iris_rdd = iris_df.rdd.map(tuple)
-    income_rdd = income_df.rdd.map(tuple)
-    print(iris_rdd.first()) # ('Q990510', 'INCIDENCIA', '2019')
-    print(income_rdd.first()) # ('Q1758503', 49315, 2009)
-    # Step 1: Map iris_df to (year, (type, 1)) pairs
-    iris_rdd = iris_rdd.map(lambda x: ((x[2], x[0]), (x[1], 1)))
-    print(iris_rdd.first()) # (('2019', 'Q990510'), ('INCIDENCIA', 1))
-    # Step 2: Reduce by key to get the count of petitions per type and year
-    petitions_count_rdd = iris_rdd.reduceByKey(lambda a, b: (a[0], a[1] + b[1])) # [(2022, [('Type A', 50), ('Type B', 70), ('Type C', 30)]),...]
-    print(petitions_count_rdd.first()) # (('2019', 'Q3321805'), ('INCIDENCIA', 1743))
-    # Step 3: Map income_df to (year, (neighborhood_id, population)) pairs
-    income_rdd = income_rdd.map(lambda x: ((x[2], x[0]), (x[0], x[1])))
-    print(income_rdd.first()) # ((2009, 'Q1758503'), ('Q1758503', 49315))
-    # Step 4: Reduce by key to sum the population per neighborhood and year
-    population_sum_rdd = income_rdd.reduceByKey(lambda a, b: (a[0], a[1] + b[1]))
-    print(population_sum_rdd.first()) # ((2007, 'Q1758503'), ('Q1758503', 46595))
-
-    # Step 5: Join the two RDDs based on the year
-    joined_rdd = petitions_count_rdd.join(population_sum_rdd)
-
-    # Step 6: Compute the ratio by dividing the count of petitions by the population
-    ratio_rdd = joined_rdd.map(lambda x: (x[0], (x[1][0][0], x[1][0][1] / x[1][1][1])))
-
-    # Step 7: Collect the results by year
-    results_by_year = ratio_rdd.collect()
-
-    print("RESULTS")
-    for result in results_by_year:
-        print(result)
 
 
 

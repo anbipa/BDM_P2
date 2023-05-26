@@ -76,6 +76,7 @@ def save_to_parquet(rdd, output_path, schema):
     # Convert RDD to DataFrame
     df = spark.createDataFrame(rdd, schema)
 
+
     # Write DataFrame to Parquet file
     df.write.parquet(output_path, mode="overwrite")
 
