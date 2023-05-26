@@ -14,7 +14,7 @@ spark = SparkSession.builder\
 
 # read data from hdfs into rdd
 iris_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/iris").select("neighborhoodID", "type", "diaDataAlta", "mesDataAlta", "anyDataAlta").rdd.map(tuple)
-income_df = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income2").select("neighborhood_id", "year", "population")#.rdd.map(tuple)
+income_df = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income").select("neighborhood_id", "year", "population")#.rdd.map(tuple)
 rents_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent").select("day", "month", "year", "neighborhoodId").rdd.map(tuple)
 
 # Get counting of housing per neighborhood and year
