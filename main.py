@@ -1,4 +1,4 @@
-from src.DataExploters.kpi_calculators2 import kpi_calculators2
+from src.DataExploters.listing_indicators import kpi_calculators2
 
 
 def print_hi(name):

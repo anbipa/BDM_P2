@@ -11,7 +11,7 @@ conf = SparkConf() \
         .set("spark.driver.extraClassPath", "../../data/postgresql-42.6.0.jar")
 
 spark = SparkSession.builder\
-    .appName("ComputeKPIs")\
+    .appName("ComputeAVGIND")\
     .config(conf=conf) \
     .getOrCreate()
 
@@ -56,9 +56,9 @@ print(result_df.show())
 # Save the DataFrame to PostgreSQL
 result_df.write \
     .format("jdbc") \
-    .option("url", "jdbc:postgresql://database-bdmp2.cjhqgymunwij.eu-north-1.rds.amazonaws.com:5432/postgres") \
-    .option("dbtable", "kpi1") \
+    .option("url", "jdbc:postgresql://10.4.41.44:5432/bdmp2") \
+    .option("dbtable", "AVGIND") \
     .option("user", "anioldani") \
-    .option("password", "anioldaniP2") \
+    .option("password", "anioldani") \
     .mode("overwrite") \
     .save()

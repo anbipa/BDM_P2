@@ -8,7 +8,7 @@ conf = SparkConf() \
         .set("spark.driver.extraClassPath", "../../data/postgresql-42.6.0.jar")
 
 spark = SparkSession.builder\
-    .appName("ComputeKPIs")\
+    .appName("ComputeLISTIND")\
     .config(conf=conf) \
     .getOrCreate()
 
@@ -30,11 +30,12 @@ result_df = incidencesAndHousing.toDF(["day", "month", "year", "neighborhood", "
 result_df.write \
         .format("jdbc") \
         .option("url", "jdbc:postgresql://10.4.41.44:5432/bdmp2") \
-        .option("dbtable", "kpi2") \
+        .option("dbtable", "LISTINGIND") \
         .option("user", "anioldani") \
         .option("password", "anioldani") \
         .mode("overwrite") \
         .save()
+
 income_df.write \
         .format("jdbc") \
         .option("url", "jdbc:postgresql://10.4.41.44:5432/bdmp2") \
@@ -44,7 +45,7 @@ income_df.write \
         .mode("overwrite") \
         .save()
 
-print("DONEEE")
+
 
 # #NO FUNCIONA NO SE PERQUE :( NO FALLA PERO VA MOLT LENT I NO ACABA MAI
 # incidencesAndHousing = incidencesAndHousing.map(lambda x: ((x[2], x[3]), x[0], x[1], x[4], x[5]))
