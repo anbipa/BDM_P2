@@ -13,24 +13,19 @@ spark = SparkSession.builder\
     .getOrCreate()
 
 # project rent data from parquet
-rentDataFrame = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent")\
-        .select("neighborhoodId", "year", "bathrooms", "rooms", "country", "distance", "district", "exterior", "hasLift", "municipality", "newDevelopment", "price", "newDevelopmentFinished", "priceByArea", "propertyType", "size")
-
-rentRDD = rentDataFrame.rdd.map(tuple)\
-        .map(lambda row: (row[0], row[1:]))
+rentRDD = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent").rdd\
+    .map(tuple).map(lambda x: (x[-1], x[-4], x[1], x[29], x[2], x[4], x[5], x[6], x[11], x[17], x[19], x[24], x[20], x[25], x[27], x[31]))\
+    .map(lambda row: (row[0], row[1:]))
 
 print(rentRDD.take(5))
 print("rows: ", rentRDD.count())
 
-incomeDataFrame = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income")\
-        .select("neighborhood_id", "year", "RFD")
-
-incomeRDD = incomeDataFrame.rdd.map(tuple)\
-        .map(lambda row: (row[0], row[1:]))
+incomeRDD = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income").rdd\
+    .map(lambda x: (x[-1], x[1], x[-2]))\
+    .map(lambda row: (row[0], row[1:])) # "neighborhood_id", "year", "RFD"
 
 print(incomeRDD.take(5))
 
-# join rent and income data
 # Join rent and income data
 joinedRDD = rentRDD.join(incomeRDD)\
         .filter(lambda row: row[1][0][0] == row[1][1][0])\
