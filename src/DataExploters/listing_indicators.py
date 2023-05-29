@@ -13,9 +13,9 @@ spark = SparkSession.builder\
     .getOrCreate()
 
 # read data from hdfs into rdd
-iris_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/iris").select("neighborhoodID", "type", "diaDataAlta", "mesDataAlta", "anyDataAlta").rdd.map(tuple)
-income_df = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income").select("neighborhood_id", "year", "population")#.rdd.map(tuple)
-rents_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent").select("day", "month", "year", "neighborhoodId").rdd.map(tuple)
+iris_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/iris").rdd.map(lambda x: (x[0], x[2], x[6], x[7], x[8]))
+income_df = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income")
+rents_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent").rdd.map(lambda x: (x[-2], x[-3], x[-4], x[-1]))
 
 # Get counting of housing per neighborhood and year
 housing_rdd = rents_rdd.map(lambda x: (x, 1)).reduceByKey(lambda a, b: a+b)
@@ -27,6 +27,7 @@ incidences_rdd = iris_rdd.filter(lambda x: x[1]=='INCIDENCIA').map(lambda x: ((i
 incidencesAndHousing = incidences_rdd.leftOuterJoin(housing_rdd).map(lambda x: (*x[0], *x[1])) # leftOuterJoins produces NULLS because only exist data for 2020 and 2021 in renting dataset. We can put join to just have joins
 
 result_df = incidencesAndHousing.toDF(["day", "month", "year", "neighborhood", "count_incidences", "count_housing"])
+
 result_df.write \
         .format("jdbc") \
         .option("url", "jdbc:postgresql://10.4.41.44:5432/bdmp2") \

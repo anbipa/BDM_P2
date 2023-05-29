@@ -33,7 +33,6 @@ def load_iris_dataset(sc):
         .map(lambda row: tuple(f.strip('"') for f in row)) \
         .filter(lambda x: x[14] != '') \
         .filter(lambda row: len(row) == 25)
-
     return rdd_tuples
 
 
@@ -43,9 +42,8 @@ def reconcile_data(lookupRDDtuples, rdd_tuples):
     iris_reconciled = irisRDDmapped.leftOuterJoin(lookupRDDmapped) \
         .map(lambda row: (row[1][1][0], row[1][0])) \
         .map(lambda x: (x[0], *x[1])) \
-        .filter(lambda row: len(row) == 26)
-
-    print(iris_reconciled.count())
+        .filter(lambda row: len(row) == 26)\
+        .map(lambda x: (*x[:12], *x[16:]))
 
     return iris_reconciled
 
@@ -67,8 +65,7 @@ if __name__ == "__main__":
 
     df = iris_reconciled.toDF(
         ["neighborhoodID", "fitxaID", "type", "area", "element", "detall", "diaDataAlta", "mesDataAlta",
-         "anyDataAlta", "diaDataTancament", "mesDataTancament", "anyDataTancament", "CODI DISTRICTE",
-         "DISTRICTE", "CODI BARRI", "BARRI", "seccioCensal", "tipusVia", "carrer", "numero", "coordenadaX",
+         "anyDataAlta", "diaDataTancament", "mesDataTancament", "anyDataTancament", "seccioCensal", "tipusVia", "carrer", "numero", "coordenadaX",
          "coordenadaY", "longitud", "latitud", "suport", "canalsResposta"])
 
     print(df.show())

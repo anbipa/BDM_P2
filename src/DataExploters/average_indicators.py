@@ -16,14 +16,12 @@ spark = SparkSession.builder\
     .getOrCreate()
 
 # Read income data from HDFS into RDD
-income_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income") \
-    .select("neighborhood_id", "RFD", "year") \
-    .rdd
+income_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income").rdd\
+    .map(lambda x: (x[-1], x[-2], x[1])) # "neighborhood_id", "RFD", "year"
 
 # Read rental data from HDFS into RDD
-rents_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent") \
-    .select("neighborhoodId", "price", "year") \
-    .rdd
+rents_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent").rdd\
+    .map(lambda x: (x[-1], x[24], x[-4])) #"neighborhoodId", "price", "year"
 
 # Map the income RDD to key-value pairs
 income_mapped_rdd = income_rdd.map(lambda row: ((row.neighborhood_id, row.year), (row.RFD, 1)))
