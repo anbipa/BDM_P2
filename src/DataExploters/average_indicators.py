@@ -2,13 +2,23 @@ import psycopg2
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
+class NeighborhoodYearPartitioner:
+    def __init__(self, num_partitions):
+        self.num_partitions = num_partitions
 
+    def __call__(self, key):
+        neighborhood, year = key
+        # Hash the combined key (neighborhood, year) to determine the partition
+        return hash((neighborhood, year)) % self.num_partitions
+
+num_partitions = 10
 
 conf = SparkConf() \
         .set("spark.master", "local") \
         .set("spark.app.name", "Spark Dataframes Tutorial") \
         .set("spark.jars", "../../data/postgresql-42.6.0.jar") \
-        .set("spark.driver.extraClassPath", "../../data/postgresql-42.6.0.jar")
+        .set("spark.driver.extraClassPath", "../../data/postgresql-42.6.0.jar")\
+        .set("spark.default.parallelism", num_partitions)
 
 spark = SparkSession.builder\
     .appName("ComputeAVGIND")\
@@ -16,18 +26,29 @@ spark = SparkSession.builder\
     .getOrCreate()
 
 # Read income data from HDFS into RDD
-income_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income").rdd\
-    .map(lambda x: (x[-1], x[-2], x[1])) # "neighborhood_id", "RFD", "year"
+income_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income") \
+    .select("neighborhood_id", "year", "RFD") \
+    .rdd\
+    .map(tuple)
 
 # Read rental data from HDFS into RDD
-rents_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent").rdd\
-    .map(lambda x: (x[-1], x[24], x[-4])) #"neighborhoodId", "price", "year"
+rents_rdd = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent") \
+    .select("neighborhoodId", "year", "price") \
+    .rdd\
+    .map(tuple)
 
 # Map the income RDD to key-value pairs
-income_mapped_rdd = income_rdd.map(lambda row: ((row.neighborhood_id, row.year), (row.RFD, 1)))
+income_mapped_rdd = income_rdd.map(lambda row: ((row[0], row[1]), (row[2], 1)))
 
 # Map the rental RDD to key-value pairs
-rents_mapped_rdd = rents_rdd.map(lambda row: ((row.neighborhoodId, row.year), (row.price, 1)))
+rents_mapped_rdd = rents_rdd.map(lambda row: ((row[0], row[1]), (row[2], 1)))
+
+# here rdd's are transformed to key-value rdd's
+# very important to optimize the partitioning in this part because no data is shuffled
+
+income_mapped_rdd = income_mapped_rdd.partitionBy(num_partitions, NeighborhoodYearPartitioner(num_partitions))
+rents_mapped_rdd = rents_mapped_rdd.partitionBy(num_partitions, NeighborhoodYearPartitioner(num_partitions))
+
 
 # Reduce by key to compute total income and count per neighborhood and year
 income_totals_rdd = income_mapped_rdd.reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1]))

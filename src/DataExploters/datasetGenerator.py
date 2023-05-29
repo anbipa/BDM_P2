@@ -61,5 +61,5 @@ joinedDataFrame = joinedRDD.toDF(schema)
 print(joinedDataFrame.show())
 
 # store data in HDFS in csv format
-rentDataFrame.write.option("header", "true").csv("hdfs://10.4.41.44:27000/user/bdm/dataset/rentdataset.csv", mode="overwrite")
+joinedDataFrame.write.option("header", "true").csv("hdfs://10.4.41.44:27000/user/bdm/dataset/rentdataset.csv", mode="overwrite")
 
