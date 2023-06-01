@@ -52,6 +52,7 @@ def load_rent_data(spark, parent_dir, schema):
         # Convert the DataFrame into an RDD and add year, month, and day columns
         rdd = df.rdd.map(lambda row: row_to_tuple(row) + (int(year), int(month), int(day)))
 
+
         # Union the RDD with the previous RDDs
         union_rdd = union_rdd.union(rdd)
 
@@ -146,16 +147,19 @@ if __name__ == "__main__":
 
     # Load rent data
     rentRDD = load_rent_data(spark, parent_dir, schema)
+
     rentRDD = drop_duplicates(rentRDD)
+
 
 
     rentRDD = rentRDD.filter(lambda x: x[18] is not None)
     rentLookupRDD = rentLookupRDD.filter(lambda x: x[1] is not None)
 
+
     # Reconcile rent data
     rentRDD_reconciled = reconcile_rent_data(rentRDD, rentLookupRDD)
 
-    print(rentRDD_reconciled.count())
+
 
     # Create new column fields
     col1 = StructField('year', IntegerType(), True)

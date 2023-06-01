@@ -13,14 +13,17 @@ spark = SparkSession.builder\
     .getOrCreate()
 
 # project rent data from parquet
-rentRDD = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent").rdd\
-    .map(tuple).map(lambda x: (x[-1], x[-4], x[1], x[29], x[2], x[4], x[5], x[6], x[11], x[17], x[19], x[24], x[20], x[25], x[27], x[31]))\
+rentRDD = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/rent")\
+    .rdd\
+    .map(tuple)\
+    .map(lambda x: (x[-1], x[-4], x[1], x[29], x[2], x[4], x[5], x[6], x[11], x[17], x[19], x[24], x[20], x[25], x[27], x[31]))\
     .map(lambda row: (row[0], row[1:]))
 
 print(rentRDD.take(5))
 print("rows: ", rentRDD.count())
 
-incomeRDD = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income").rdd\
+incomeRDD = spark.read.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income")\
+    .rdd\
     .map(lambda x: (x[-1], x[1], x[-2]))\
     .map(lambda row: (row[0], row[1:])) # "neighborhood_id", "year", "RFD"
 

@@ -1,11 +1,5 @@
 import pyspark
-from pyspark.sql import SparkSession
-from pyspark.sql.types import *
 from pyspark.sql import SQLContext
-from pyspark.sql import Row
-from pyspark import SparkConf
-import json
-import os
 import re
 from incomeFormatter import drop_duplicates
 
