@@ -18,8 +18,8 @@ def load_income_dataset(sc):
 
 
 def load_lookup_tables(sc):
-    incomeDistricts = sc.textFile("../../data/lookup_tables/income_lookup_district.json")
-    incomeNeighborhoods = sc.textFile("../../data/lookup_tables/income_lookup_neighborhood.json")
+    incomeDistricts = sc.textFile("../data/lookup_tables/income_lookup_district.json")
+    incomeNeighborhoods = sc.textFile("../data/lookup_tables/income_lookup_neighborhood.json")
 
     districtsRDD = incomeDistricts \
         .map(lambda line: json.loads(line)) \
@@ -67,13 +67,13 @@ def save_to_parquet(rdd):
     # Stop the SparkSession
     spark.stop()
 
-
-if __name__ == "__main__":
+def execute_income_formatter():
     sc = pyspark.SparkContext.getOrCreate()
     incomeRDD = load_income_dataset(sc)
     incomeRDD = drop_duplicates(incomeRDD)
     lookupRDD = load_lookup_tables(sc)
     rdd = reconcile_income_data(incomeRDD, lookupRDD)
-    print(rdd.first())
-    print(rdd.count())
     save_to_parquet(rdd)
+
+
+

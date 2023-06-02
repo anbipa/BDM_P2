@@ -1,10 +1,12 @@
 import os
-
 import pyspark
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 import json
-from incomeFormatter import drop_duplicates
+
+
+def drop_duplicates(rdd):
+    return rdd.distinct()
 
 
 def row_to_tuple(row):
@@ -19,8 +21,8 @@ def row_to_tuple(row):
 
 
 def load_rent_lookup_tables(sc):
-    rentDistricts = sc.textFile("../../data/lookup_tables/rent_lookup_district.json")
-    rentNeighborhoods = sc.textFile("../../data/lookup_tables/rent_lookup_neighborhood.json")
+    rentDistricts = sc.textFile("../data/lookup_tables/rent_lookup_district.json")
+    rentNeighborhoods = sc.textFile("../data/lookup_tables/rent_lookup_neighborhood.json")
 
     rentDistrictsRDD = rentDistricts \
         .map(lambda line: json.loads(line)) \
@@ -85,9 +87,7 @@ def save_to_parquet(rdd, output_path, schema):
     spark.stop()
 
 
-
-
-if __name__ == "__main__":
+def execute_housing_formatter():
     sc = pyspark.SparkContext.getOrCreate()
     spark = SparkSession.builder.appName("ReadParquetRDD").getOrCreate()
 
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     rentLookupRDD = load_rent_lookup_tables(sc)
     print(rentLookupRDD.first())  # Gives (neighborhood_id, neighborhood, neighborhood_n, neighborhood_reconciled, District_id, district, district_n, district_reconciled)
 
-    parent_dir = "../../data/idealista"
+    parent_dir = "../data/idealista"
 
     # Define the schema
     schema = StructType([StructField('address', StringType(), True),

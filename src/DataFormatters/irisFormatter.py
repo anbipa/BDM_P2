@@ -1,10 +1,14 @@
 import pyspark
 from pyspark.sql import SQLContext
 import re
-from incomeFormatter import drop_duplicates
+
+
+def drop_duplicates(rdd):
+    return rdd.distinct()
+
 
 def load_lookup_table(sc):
-    lookupRDD = sc.textFile("../../data/lookup_tables/lookupIRIS.csv")
+    lookupRDD = sc.textFile("../data/lookup_tables/lookupIRIS.csv")
     pattern = r'(".*?),(.*)(")'
     headerLookup = lookupRDD.first()  # Filter header row
     # Map each CSV row to a tuple
@@ -46,7 +50,7 @@ def save_to_parquet(df, output_path):
     df.write.parquet(output_path, mode="overwrite")
 
 
-if __name__ == "__main__":
+def execute_iris_formatter():
     sc = pyspark.SparkContext.getOrCreate()
     sqlContext = SQLContext(sc)
 

@@ -95,23 +95,24 @@ def save_model(model, file_path):
     # Save the model
     model.save(model_path)
 
-# Define the file path
-file_path = "hdfs://10.4.41.44:27000/user/bdm/dataset/rentdataset.csv"
+def train_and_save():
+    # Define the file path
+    file_path = "hdfs://10.4.41.44:27000/user/bdm/dataset/rentdataset.csv"
 
-# Load the data
-data = load_data(file_path)
+    # Load the data
+    data = load_data(file_path)
 
-# Preprocess the data
-train_data, test_data = preprocess_data(data)
+    # Preprocess the data
+    train_data, test_data = preprocess_data(data)
 
-# Train the model
-trained_model = train_model(train_data)
+    # Train the model
+    trained_model = train_model(train_data)
 
-# Evaluate the model
-evaluate_model(trained_model, test_data)
+    # Evaluate the model
+    evaluate_model(trained_model, test_data)
 
-# Define the model path
-model_path = "hdfs://10.4.41.44:27000/user/bdm/models/random_forest_model"
+    # Define the model path
+    model_path = "hdfs://10.4.41.44:27000/user/bdm/models/random_forest_model"
 
-# Save the model
-save_model(trained_model, model_path)
+    # Save the model
+    save_model(trained_model, model_path)

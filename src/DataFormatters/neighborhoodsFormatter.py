@@ -1,8 +1,9 @@
-from incomeFormatter import load_lookup_tables
-from irisFormatter import load_lookup_table
-from rentFormatter import load_rent_lookup_tables
+from DataFormatters.incomeFormatter import load_lookup_tables
+from DataFormatters.irisFormatter import load_lookup_table
+from DataFormatters.housingFormatter import load_rent_lookup_tables
 import pyspark
 from pyspark.sql import SparkSession
+
 
 def prepareRDD(rdd):
     #We do not take the lower case reconciled neighborhoods/districts to join with Iris lookup
@@ -33,7 +34,7 @@ def save_to_parquet(rdd):
     # Stop the SparkSession
     spark.stop()
 
-if __name__ == "__main__":
+def execute_neighborhood_formatter():
     sc = pyspark.SparkContext.getOrCreate()
     lookupIncomeRDD = prepareRDD(load_lookup_tables(sc))
     lookupIrisRDD = load_lookup_table(sc)

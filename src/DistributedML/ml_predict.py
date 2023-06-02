@@ -1,7 +1,7 @@
 from hdfs import InsecureClient
 from pyspark.ml.regression import RandomForestRegressionModel
 from pyspark.sql import SparkSession
-from ml_trainer import preprocess_data, load_data, evaluate_model
+from DistributedML.ml_trainer import preprocess_data, load_data, evaluate_model
 
 
 def choose_model(path):
@@ -40,25 +40,26 @@ def choose_model(path):
     return model
 
 
-# Define the path to the models
-model_path = "models"
+def deploy_and_predict():
+    # Define the path to the models
+    model_path = "models"
 
-# Create a SparkSession
-spark = SparkSession.builder.appName("ModelPrediction").getOrCreate()
+    # Create a SparkSession
+    spark = SparkSession.builder.appName("ModelPrediction").getOrCreate()
 
-# Choose the model
-model = choose_model(model_path)
+    # Choose the model
+    model = choose_model(model_path)
 
-# define dataset path
-dataset_path = "hdfs://10.4.41.44:27000/user/bdm/dataset/rentdataset.csv"
+    # define dataset path
+    dataset_path = "hdfs://10.4.41.44:27000/user/bdm/dataset/rentdataset.csv"
 
-# Load the data
-data = load_data(dataset_path)
+    # Load the data
+    data = load_data(dataset_path)
 
-# Preprocess the data
-train_data, test_data = preprocess_data(data)
+    # Preprocess the data
+    train_data, test_data = preprocess_data(data)
 
-# Evaluate the model
-evaluate_model(model, test_data)
+    # Evaluate the model
+    evaluate_model(model, test_data)
 
 
