@@ -18,11 +18,11 @@ def menu_options():
 
     print("0. Create LookUp Data (IRIS)")
     print("1. Execute Data Formatters")
-    print("4. Prepare Data for KPIs")
-    print("5. Generate datasets for ML")
-    print("6. Train and deploy ML model")
-    print("7. Deploy ML model and predict")
-    print("8. Exit")
+    print("2. Prepare Data for KPIs")
+    print("3. Generate datasets for ML")
+    print("4. Train and deploy ML model")
+    print("5. Deploy ML model and predict")
+    print("6. Exit")
 
     option = input("\nSelect a option (number): ")
 
