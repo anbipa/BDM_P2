@@ -88,7 +88,6 @@ def execute_housing_formatter():
 
     # Load lookup tables
     rentLookupRDD = load_rent_lookup_tables(sc)
-    print(rentLookupRDD.first())  # Gives (neighborhood_id, neighborhood, neighborhood_n, neighborhood_reconciled, District_id, district, district_n, district_reconciled)
 
     parent_dir = "../data/idealista"
 

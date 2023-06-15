@@ -2,6 +2,8 @@ import psycopg2
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
+
+# function finally not used but considered as an optimization
 def insert_row(row):
     conn = psycopg2.connect(
         host="10.4.41.44",
@@ -46,8 +48,8 @@ def execute_map_reducers():
     conf = SparkConf() \
             .set("spark.master", "local") \
             .set("spark.app.name", "Spark Dataframes Tutorial") \
-            .set("spark.jars", "../../data/postgresql-42.6.0.jar") \
-            .set("spark.driver.extraClassPath", "../../data/postgresql-42.6.0.jar")\
+            .set("spark.jars", "../data/postgresql-42.6.0.jar") \
+            .set("spark.driver.extraClassPath", "../data/postgresql-42.6.0.jar")\
             .set("spark.default.parallelism", num_partitions)
 
     spark = SparkSession.builder\
@@ -180,5 +182,9 @@ def execute_map_reducers():
         .option("password", "anioldani") \
         .mode("overwrite") \
         .save()
+
+    print("Done!")
+    # Close the Spark session
+    spark.stop()
 
 

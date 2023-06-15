@@ -3,3 +3,4 @@ pandas==1.5.3
 psycopg2==2.9.6
 pyspark==3.4.0
 reconciler==0.2.2
+numpy==1.23.3

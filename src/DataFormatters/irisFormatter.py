@@ -24,7 +24,7 @@ def load_lookup_table(sc):
 
 
 def load_iris_dataset(sc):
-    irisRDD = sc.textFile("../../data/iris/*.csv")
+    irisRDD = sc.textFile("../data/iris/*.csv")
     headerIris = irisRDD.first()
     rdd_tuples = irisRDD.filter(lambda row: row != headerIris) \
         .map(lambda row: tuple(row.split(","))) \

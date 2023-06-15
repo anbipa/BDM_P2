@@ -20,7 +20,7 @@ def menu_options():
     print("1. Execute Data Formatters")
     print("2. Prepare Data for KPIs")
     print("3. Generate datasets for ML")
-    print("4. Train and deploy ML model")
+    print("4. Train and save ML model")
     print("5. Deploy ML model and predict")
     print("6. Exit")
 

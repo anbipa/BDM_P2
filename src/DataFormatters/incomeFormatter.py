@@ -7,7 +7,7 @@ def drop_duplicates(rdd):
     return rdd.distinct()
 
 def load_income_dataset(sc):
-    incomes = sc.textFile("../../data/income_opendata/income_opendata_neighborhood.json")
+    incomes = sc.textFile("../data/income_opendata/income_opendata_neighborhood.json")
     incomeRDD = incomes \
         .map(lambda line: json.loads(line)) \
         .flatMap(
