@@ -23,15 +23,12 @@ def getDistinctNeighborhoods(lookupRDD1, lookupRDD2, lookupRDD3):
     return reconciledRDD
 
 def save_to_parquet(rdd):
-    # Create a SparkSession
     spark = SparkSession.builder \
         .appName("RDD to Parquet") \
         .getOrCreate()
-    # Convert RDD to DataFrame
     df = spark.createDataFrame(rdd, ["neighborhood_id", "neighborhood_reconciled", "district_id", "district_reconciled"])
     # Write DataFrame to Parquet file in HDFS
     df.write.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/neighborhoods", mode="overwrite")
-    # Stop the SparkSession
     spark.stop()
 
 def execute_neighborhood_formatter():

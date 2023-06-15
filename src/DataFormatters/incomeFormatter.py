@@ -53,18 +53,14 @@ def reconcile_income_data(incomeRDD, lookupRDD):
 
 
 def save_to_parquet(rdd):
-    # Create a SparkSession
     spark = SparkSession.builder \
         .appName("RDD to Parquet") \
         .getOrCreate()
 
-    # Convert RDD to DataFrame
     df = spark.createDataFrame(rdd, ["id", "year", "population", "RFD", "neighborhood_id"])
 
     # Write DataFrame to Parquet file in HDFS
     df.write.parquet("hdfs://10.4.41.44:27000/user/bdm/parquet/income", mode="overwrite")
-
-    # Stop the SparkSession
     spark.stop()
 
 def execute_income_formatter():

@@ -9,7 +9,7 @@ def execute_lookup_iris():
 
     for filename in os.listdir(directory):
         print(filename)
-        if filename.endswith('.csv'):  # replace with the file extension you want to iterate over
+        if filename.endswith('.csv'):
             file = os.path.join(directory, filename)
             df = pd.read_csv(file)
             df = df[['BARRI', 'DISTRICTE']]

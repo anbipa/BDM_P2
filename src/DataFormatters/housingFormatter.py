@@ -71,19 +71,14 @@ def reconcile_rent_data(rentRDD, rentLookupRDD):
 
 
 def save_to_parquet(rdd, output_path, schema):
-    # Create a SparkSession
     spark = SparkSession.builder \
         .appName("RDD to Parquet") \
         .getOrCreate()
 
-    # Convert RDD to DataFrame
     df = spark.createDataFrame(rdd, schema)
-
 
     # Write DataFrame to Parquet file
     df.write.parquet(output_path, mode="overwrite")
-
-    # Stop the SparkSession
     spark.stop()
 
 
@@ -147,10 +142,7 @@ def execute_housing_formatter():
 
     # Load rent data
     rentRDD = load_rent_data(spark, parent_dir, schema)
-
     rentRDD = drop_duplicates(rentRDD)
-
-
 
     rentRDD = rentRDD.filter(lambda x: x[18] is not None)
     rentLookupRDD = rentLookupRDD.filter(lambda x: x[1] is not None)
@@ -158,8 +150,6 @@ def execute_housing_formatter():
 
     # Reconcile rent data
     rentRDD_reconciled = reconcile_rent_data(rentRDD, rentLookupRDD)
-
-
 
     # Create new column fields
     col1 = StructField('year', IntegerType(), True)
