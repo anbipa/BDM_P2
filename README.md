@@ -26,11 +26,15 @@ and the file to predict the rental price of a new apartment ([ml_predict.py](src
 ## Instructions:
 In order to run the project, please install the requirements using the following command:
 
-```pip install -r requirements.txt```
+```
+pip install -r requirements.txt 
+```
 
 You just need to run the [executeProgram.py](src%2FexecuteProgram.py) by using the following command:
 
-```python src/executeProgram.py```
+```
+python src/executeProgram.py
+```
 
 This will show a menu with the different options to run the project:
 ```
